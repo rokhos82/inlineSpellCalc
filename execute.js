@@ -3,7 +3,8 @@ function updateDebugBox() {
 	debugBox.innerHTML = sCalc.traceLog;
 }
 
-var ManagerData = new {};
+var Manager = {};
+Manager.devStack = new Array();
 //var Manager = new pracMan.pracManagerSVC(ManagerData, "pracManDisplay");
 
 /*

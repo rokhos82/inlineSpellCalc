@@ -1,6 +1,6 @@
 <html>
 <head>
-	<title>Practice Manager</title>
+	<title>Spell Calc</title>
 
 	<link href="sCalc.css" rel="stylesheet" type="text/css" />
 
@@ -20,67 +20,84 @@
 		</div>
 
 	<div class="pracManpanel">
-		<div>
+		<table>
+		<tr>
+
+		<td>
 			Variables: <textarea id="variables" rows="10" cols="40">
 {
-	// defined values
-	stamMIN: 1,
-	strainBASE: 4,
-	strainEPOT: 3,
-	strainTARG: 4,
-	diffBASE: 20,
-	diffEPOT: 20,
-	diffTARG: 10,
-	damageDiceType: "d6",
+	"stamMIN": 1,
+	"strainBASE": 4,
+	"strainEPOT": 3,
+	"strainAOE": 0,
+	"strainTARG": 4,
+	"strainRANGE": 0,
+	"strainDUR": 0,
+	"diffBASE": 20,
+	"diffEPOT": 20,
+	"diffAOE": 0,
+	"diffTARG": 10,
+	"diffRANGE": 0,
+	"diffDUR": 0,
+	"damageDiceType": "d6",
 
+	"totalTAV": 0,
+	"power":0 ,
+	"staging": 0,
+	"damageDice": 0,
+	"surge": 0,
+	"drain": 0,
 
-	// calculated values
-	power:0 ,
-	staging: 0,
-	damageDice: 0,
+	"txtDamage": "",
+	"txtStaging": "",
+	"txtResist": "",
+	"txtDrain": "",
+	"txtSurge": "",
 
-	// textOutPut
-	txtDamage: "",
-	txtStaging: "",
-	txtResist: "",
-	txtDrain: "",
-	txtSurge: "",
-
-	// user defined
-	EPOT: 1,
-	targets: 1,
-	overpower: 0,
-	attribute: 10,
-	spellRank: 4,
-	disciplineRank: 4
-
+	"EPOT": 1,
+	"targets": 1,
+	"overpower": 0,
+	"attribute": 10,
+	"spellRank": 4,
+	"disciplineRank": 4
 }
 		</textarea>
-		</div>
+		</td>
 
-		<div>
+		<td>
 			Form Structure: <textarea id="formStruc" rows="10" cols="40">
-{
-	// varname: "label"
-	EPOT: "EPOT",
-	targets: "# of Targets",
-	overpower: "Overpower"
-}
-			</textarea>
-		</div>
-
-		<div>
-			Calculation: <textarea id="calculator"></textarea>
-		</div>
-
-		<div>
-			Report: <textarea id="report">
 [
-	["Damage: ", txtDamage + " per round", "Resist: ", txtResist],
-	["Drain: ", txtDrain, "Surge: ", txtSurge]
+	[ {"map": "EPOT", "label": "# EPOT", "hCol": 2}, {"map": "targets", "label": "# of Targets"}],
+	[ {"map": "overpower", "label": "Overpower", "fCol":2}, { "map": "damageDiceType", "label": "Damage Die:", "inpType": "text"} ]
 ]
 		</textarea>
-		</div>
+		</td>
+	</tr>
+		<td>
+			Calculation: <textarea id="calculator">
+v.totalTAV = v.diffBASE + (v.EPOT * v.diffEPOT) + (v.targets * v.diffTARG);
+v.totalStrain = v.strainBASE + (v.EPOT * v.strainEPOT) + (v.targets * v.strainTARG);
+		</textarea>
+		</td>
+
+		<td>
+			Report: <textarea id="report">
+[
+	[ { "text": "Damage: ", "style": "header"}, { "text": ["$txtDamage", " per round"]} , {"text": "Resist: ", "style":"header"}, "$txtResist"],
+	[ { "text": "Drain: ", "style": "header"}, { "text": "$txtDrain", "cols": 3} ]
+]
+		</textarea>
+
+		</td>
+		</tr>
+	</table>
+		function(targ, v, f, c, r)
+		
+		<input type='button' onclick="Manager.devStack.push (new sCalc('sCalcDisplay', 
+			document.getElementById('variables').value,
+			document.getElementById('formStruc').value,
+			document.getElementById('calculator').value,
+			document.getElementById('report').value) );" value="add new object"/>
 	</div>
 
 

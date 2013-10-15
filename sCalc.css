@@ -81,7 +81,24 @@ input[type="text"]:focus, select:focus, input[type="submit"]:focus, input[type="
 		color: green;
 		background-color: black; }
 
+.spellCalcForm{
+	padding: 10px;
+	background-color: #cfc;
+	background: -webkit-gradient(linear, left top, left bottom, from(#aca), to(#cfc)); /* for webkit browsers */
+	background: -moz-linear-gradient(top,  #aca,  #cfc); /* for firefox 3.6+ */
+}
 
+.spellCalcRep{
+	padding: 10px;
+	background-color: #cfc;
+	background: -webkit-gradient(linear, left top, left bottom, from(#aca), to(#cfc)); /* for webkit browsers */
+	background: -moz-linear-gradient(top,  #aca,  #cfc); /* for firefox 3.6+ */
+}
+
+.spellCalcHead {
+	font-weight: bold;
+	text-align: right;
+}
 
 
 /* CSS for the tabs.  It is best not to fiddle with these */
