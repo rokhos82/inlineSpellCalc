@@ -74,17 +74,17 @@
 		</td>
 	</tr>
 		<td>
-			Calculation: <textarea id="calculator">
+			Calculation: <textarea id="calculator"  rows="10" cols="40">
 v.totalTAV = v.diffBASE + (v.EPOT * v.diffEPOT) + (v.targets * v.diffTARG);
 v.totalStrain = v.strainBASE + (v.EPOT * v.strainEPOT) + (v.targets * v.strainTARG);
 		</textarea>
 		</td>
 
 		<td>
-			Report: <textarea id="report">
+			Report: <textarea id="report"  rows="10" cols="40">
 [
-	[ { "text": "Damage: ", "style": "header"}, { "text": ["$txtDamage", " per round"]} , {"text": "Resist: ", "style":"header"}, "$txtResist"],
-	[ { "text": "Drain: ", "style": "header"}, { "text": "$txtDrain", "cols": 3} ]
+	[ { "text": "Damage: ", "class": "header"}, { "text": ["$txtDamage", " per round"]} , {"text": "Resist: ", "class":"header"}, "$txtResist"],
+	[ { "text": "Drain: ", "class": "header"}, { "text": "$txtDrain", "cols": 3}, "Yay" ]
 ]
 		</textarea>
 

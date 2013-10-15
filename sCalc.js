@@ -7,26 +7,56 @@ var sCalc = function(targ, v, f, c, r) {
 	this.calculator = c;
 	this.report = r;
 
-	this.initialize();
+	this.repFields = {};
 
+	this.initialize();
+	this.log = "";
 }
 
+
 	sCalc.prototype.initialize = function() {
+	this.log += "CALL sCalc.prototype.initialize = function()\n";
 		this.v = JSON.parse(this.variables);
 		this.f = JSON.parse(this.formStruc);
 		this.r = JSON.parse(this.report);
 
 		this.buildForm();
-		this.buildReport();
-		this.buildCalculator();
+//		this.buildReport();
+//		this.update();
+	this.log += "FINISH sCalc.prototype.initialize = function()\n";
 	}
 
-	sCalc.prototype.buildCalculator = function() {
+
+	sCalc.prototype.update = function(inputObj) {
+	this.log += "CALL sCalc.prototype.update = function(inputObj) \n";
+		if (inputObj) {
+			if (inpObj.inpDef && inputObj.inpDef.inpType === "text") {
+				this.v[inputObj.inpDef.map] = inputObj.value;
+
+				this.calculate();
+			} else {
+				if ( isNaN(inputObj.value) ) {
+					inputObj.value = this.v[inputObj.inpDef.map];
+				}
+				else {
+					this.v[inputObj.inpDef.map] = parseInt(inputObj.value,10);
+				}
+				this.calculate();
+			}
+		}
+	this.log += "CALL sCalc.prototype.update = function(inputObj) \n";
 	}
+
 
 	sCalc.prototype.calculate = function() {
-		eval ("var v = this.v; " + this.calculator);
+		try {
+			eval ("var v = this.v; " + this.calculator);
+		} 
+		catch (exception) {
+			alert(exception);
+		}
 	}
+
 
 	sCalc.prototype.buildForm = function() {
 		var formBox = createSuperElement("div", ["class", "spellCalcForm"], ["innerHTML", "Form Box"]);
@@ -43,26 +73,24 @@ var sCalc = function(targ, v, f, c, r) {
 		}
 	}
 
+
 	sCalc.prototype.buildFormRow = function(rdef, table) {
 		var tr;
 		var td;
 
 		tr = createSuperElement("tr");
-		td = createSuperElement("td",["innerHTML", "Row " + usefulTypeOf(rdef)] );
-		appendChildren(tr,td);
+//		td = createSuperElement("td",["innerHTML", "Row " + usefulTypeOf(rdef)] );
+//		appendChildren(tr,td);
 
 		if (usefulTypeOf(rdef) === "[object Array]" ) {
 			for (var j = 0; j < rdef.length; j++) {
-//				td = createSuperElement("td", ["innerHTML", "L1." + j + usefulTypeOf(rdef[j]) ]);
-			//	appendChildren(tr,td);
 				this.buildFormCell(rdef[j], tr);
 			}
 		}
 
-
-
 		appendChildren(table, tr);
 	}
+
 
 	sCalc.prototype.buildFormCell = function(cellDef, row) {
 		var tdH;
@@ -84,30 +112,6 @@ var sCalc = function(targ, v, f, c, r) {
 		}
 	}
 
-	sCalc.prototype.update = function(inputObj) {
-		if (inputObj.inpDef.inpType === "text") {
-			this.v[inputObj.inpDef.map] = inputObj.value;
-
-			this.calculate();
-		} else {
-			if ( isNaN(inputObj.value) ) {
-				inputObj.value = this.v[inputObj.inpDef.map];
-			}
-			else {
-				this.v[inputObj.inpDef.map] = parseInt(inputObj.value,10);
-			}
-			this.calculate();
-		}
-	}
-
-
-
-
-
-
-
-
-
 
 
 
@@ -118,7 +122,73 @@ var sCalc = function(targ, v, f, c, r) {
 		this.elems.repBox = repBox;
 
 		appendChildren(this.displayBox,repBox);
+
+		if (usefulTypeOf(this.r) === "[object Array]") {
+			var repTable = createSuperElement("table", ["class", "spellCalcRep"]);
+			appendChildren(repBox, repTable);
+			for(var i = 0; i < this.r.length; i++) {
+				this.buildReportRow(this.r[i], repTable);
+			}
+		}		
 	}
+
+	sCalc.prototype.buildReportRow = function(rdef, table) {
+		var tr;
+		var td;
+
+		tr = createSuperElement("tr");
+		td = createSuperElement("td",["innerHTML", "Row " + usefulTypeOf(rdef)] );
+		appendChildren(tr,td);
+
+		if (usefulTypeOf(rdef) === "[object Array]" ) {
+			for (var j = 0; j < rdef.length; j++) {
+				this.buildReportCell(rdef[j], tr);
+			}
+		}
+
+		appendChildren(table, tr);
+	}
+
+	sCalc.prototype.buildReportCell = function(cellDef, row) {
+		var cell;
+
+		if (usefulTypeOf(cellDef) === "[object String]") {
+			if (cellDef.indexOf(0) === "$") {
+				this.buildReportDynamicSpan(cellDef);
+				cell = createSuperElement("td", ["innerHTML",cellDef]);
+			} else {
+				cell = createSuperElement("td", ["class", "spellCalcRep"], ["innerHTML",cellDef]);
+			}
+		} 
+
+		appendChildren(row, cell);
+
+/*
+		else if (usefulTypeOf(cellDef) === "[object Object]" ) {
+			cell = createSuperElement("td", 
+					["class", "spellCalcRep" + cellDef["class"] ],
+					["colspan", (cellDef.cols) ? cellDef.cols : 1],
+					["innerHTML",usefulTypeOf(cellDef.text)]);
+		}
+/*			tdI = createSuperElement("td", ["colspan", (cellDef.fCol) ? cellDef.fCol : 1]);
+			inp = createSuperElement("input", 
+				["size",2], ["maxlength",4], 
+				["value", (this.v[cellDef.map]) ? this.v[cellDef.map] : 0 ],
+				["onchange", "this.SCobj.update(this);"]);
+			inp.inpDef = cellDef;
+			inp.SCobj = this;
+			appendChildren(tdI,inp);
+*/
+	}
+
+	sCalc.prototype.buildReportDynamicSpan = function(varName) {
+		var fieldName = varName.substring(1,varName.legnth - 1);
+		alert(fieldName);
+	}
+
+
+
+
 /*
 var sCalc = {
 	"version": "20131014a",

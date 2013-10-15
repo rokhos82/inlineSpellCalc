@@ -100,6 +100,11 @@ input[type="text"]:focus, select:focus, input[type="submit"]:focus, input[type="
 	text-align: right;
 }
 
+.spellCalcRepHead {
+	font-weight: bold;
+	text-align: right;	
+}
+
 
 /* CSS for the tabs.  It is best not to fiddle with these */
 .pracManTabSet li { /* do not change */

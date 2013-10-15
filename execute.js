@@ -7,6 +7,11 @@ var Manager = {};
 Manager.devStack = new Array();
 //var Manager = new pracMan.pracManagerSVC(ManagerData, "pracManDisplay");
 
+
+var logger = {
+	
+}
+
 /*
 if (Manager.activeChar) {
 	var myDebug = JSON.stringify(Manager.activeChar.d);
