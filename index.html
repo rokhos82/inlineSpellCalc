@@ -1,0 +1,78 @@
+<html>
+<head>
+	<title>Practice Manager</title>
+
+	<link href="sCalc.css" rel="stylesheet" type="text/css" />
+
+
+	
+	<script type="text/javascript" src="sCalc.js"></script>
+
+
+
+</head>
+
+<body>
+		<div class='console'>
+			<form id="commandLine" name="commandLine" size="120" onSubmit="pracMan.eval(document.forms['commandLine'].elements['command'].value); updateDebugBox(); document.forms['commandLine'].elements['command'].value = ''; return false;">
+				<input class='console' size="80" name="command" /><input type="submit" value="run" />
+			</form>
+		</div>
+
+	<div class="pracManpanel">
+		<div>
+			Variables: <textarea id="variables" rows="10" cols="40">
+{
+	stamMIN: 1,
+	strainBASE: 4,
+	strainEPOT: 3,
+	strainTARG: 4,
+	diffBASE: 20,
+	diffEPOT: 20,
+	diffTARG: 10,
+	power,
+
+	EPOT: 1,
+	targets: 1,
+	overpower: 0,
+	attribute: 10,
+	spellRank: 4,
+	disciplineRank: 4,
+	staging: 0
+}
+		</textarea>
+		</div>
+
+		<div>
+			Form Structure: <textarea id="formStruc" rows="10" cols="40">
+{
+	// varname: label
+	EPOT: "EPOT",
+	targets: "# of Targets",
+	overpower: "Overpower"
+}
+			</textarea>
+		</div>
+
+		<div>
+			Calculation: <textarea id="calculator"></textarea>
+		</div>
+
+		<div>
+			Report: <textarea id="report"></textarea>
+		</div>
+	</div>
+
+
+	<div id="sCalcDisplay"></div>
+
+
+	<div class='console'><pre id="debug_feedback"></pre></div>
+
+	<script type="text/javascript" src="execute.js"></script>
+
+
+
+</body>
+
+</html>
