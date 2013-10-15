@@ -7,6 +7,9 @@ var sCalc = function(targ, v, f, c, r) {
 	this.report = r;
 }
 
+	sCalc.prototype.
+
+/*
 var sCalc = {
 	"version": "20131014a",
 	"formname": "sCalcInterface",
@@ -18,6 +21,8 @@ var sCalc = {
 	"logCalls": 0,
 	"storageName": "chronSpellCalc"
 }; 
+
+*/
 
 
 	sCalc.prototype.log = function(msg) {

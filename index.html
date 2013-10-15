@@ -23,6 +23,7 @@
 		<div>
 			Variables: <textarea id="variables" rows="10" cols="40">
 {
+	// defined values
 	stamMIN: 1,
 	strainBASE: 4,
 	strainEPOT: 3,
@@ -30,15 +31,29 @@
 	diffBASE: 20,
 	diffEPOT: 20,
 	diffTARG: 10,
-	power,
+	damageDiceType: "d6",
 
+
+	// calculated values
+	power:0 ,
+	staging: 0,
+	damageDice: 0,
+
+	// textOutPut
+	txtDamage: "",
+	txtStaging: "",
+	txtResist: "",
+	txtDrain: "",
+	txtSurge: "",
+
+	// user defined
 	EPOT: 1,
 	targets: 1,
 	overpower: 0,
 	attribute: 10,
 	spellRank: 4,
-	disciplineRank: 4,
-	staging: 0
+	disciplineRank: 4
+
 }
 		</textarea>
 		</div>
@@ -46,7 +61,7 @@
 		<div>
 			Form Structure: <textarea id="formStruc" rows="10" cols="40">
 {
-	// varname: label
+	// varname: "label"
 	EPOT: "EPOT",
 	targets: "# of Targets",
 	overpower: "Overpower"
@@ -59,7 +74,12 @@
 		</div>
 
 		<div>
-			Report: <textarea id="report"></textarea>
+			Report: <textarea id="report">
+[
+	["Damage: ", txtDamage + " per round", "Resist: ", txtResist],
+	["Drain: ", txtDrain, "Surge: ", txtSurge]
+]
+		</textarea>
 		</div>
 	</div>
 
