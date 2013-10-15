@@ -1,4 +1,4 @@
-PracticeMan
-===========
+inlineSpellCalc
+===============
 
-This is a HTML5 project intended to create a system that allows musicians to track their practice and progress on their music projects.
+Used to create an inline spell calculator for kantia system website.
