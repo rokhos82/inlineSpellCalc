@@ -24,6 +24,8 @@
 		<tr>
 
 		<td>
+			Variables must be defined as a list in a JSON object. Order is unimportant. 
+			<br />
 			Variables: <textarea id="variables" rows="10" cols="40">
 {
 	"stamMIN": 1,
@@ -66,6 +68,9 @@
 		</td>
 
 		<td>
+			Forms are defined as an Array of Arrays.  Each sub-array represents one row.<br />
+			Rows are objects with the followings attributes: {"map": "variableName", "label": "Label Text"}<br />
+			Optional attributes are "hCol" and "fCol" for the colspan of the header or form field. "inpType":"text" will allow non-numeric input.<br />
 			Form Structure: <textarea id="formStruc" rows="10" cols="40">
 [
 	[ {"map": "EPOT", "label": "# EPOT", "hCol": 2}, {"map": "targets", "label": "# of Targets"}],
@@ -75,6 +80,7 @@
 		</td>
 	</tr>
 		<td>
+			Calculation is valid javascript.  Use math and string functions to manipulate variables.  All object variables are accessible with "v."<br/>
 			Calculation: <textarea id="calculator"  rows="10" cols="40">
 v.totalTAV = v.diffBASE + (v.EPOT * v.diffEPOT) + (v.targets * v.diffTARG);
 v.totalStrain = v.strainBASE + (v.EPOT * v.strainEPOT) + (v.targets * v.strainTARG);
@@ -82,6 +88,12 @@ v.totalStrain = v.strainBASE + (v.EPOT * v.strainEPOT) + (v.targets * v.strainTA
 		</td>
 
 		<td>
+			Reports are output defined as an array of arrays. Each sub-array represents one row.<br />
+			Each element in a sub-array represents a single cell.<br />
+			If a dynamic variable is mapped, format is "$variableName"<br/>
+			Simple cells can have the following formats: "string", "$variable" <br />
+			Complex cells are objects with {"text": "textValue", "class": "optionalCSSClass", "cols": integer}<br />
+			Concatenation of text and dynamic fields are possible by defining a "text" attribute as an array like {"text": ["a", "b", "$variable", "c"]}</br>
 			Report: <textarea id="report"  rows="10" cols="40">
 [
 	[ {"text": "Total Strain:", "class": "header"}, "$totalStrain", {"text": "Total TAV:"}, "$totalTAV" ],
