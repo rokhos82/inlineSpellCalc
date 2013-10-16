@@ -17,7 +17,7 @@ var sCalc = function(targ, v, f, c, r, logger) {
 
 
 	sCalc.prototype.initialize = function() {
-	this.log("CALL sCalc.prototype.initialize = function()");
+		this.log("CALL sCalc.prototype.initialize = function()");
 		this.v = JSON.parse(this.variables);
 		this.f = JSON.parse(this.formStruc);
 		this.r = JSON.parse(this.report);
@@ -25,14 +25,14 @@ var sCalc = function(targ, v, f, c, r, logger) {
 		this.buildForm();
 		this.buildReport();
 		this.update();
-	this.log("FINISH sCalc.prototype.initialize = function()");
+		this.log("FINISH sCalc.prototype.initialize = function()");
 	}
 
 
 	sCalc.prototype.update = function(inputObj) {
-	this.log ("CALL sCalc.prototype.update = function(inputObj)");
+		this.log ("CALL sCalc.prototype.update = function(inputObj)");
 		if (inputObj) {
-			if (inpObj.inpDef && inputObj.inpDef.inpType === "text") {
+			if (inputObj.inpDef && inputObj.inpDef.inpType === "text") {
 				this.v[inputObj.inpDef.map] = inputObj.value;
 
 				this.calculate();
@@ -46,24 +46,31 @@ var sCalc = function(targ, v, f, c, r, logger) {
 				this.calculate();
 			}
 		}
-	this.log("FINISH sCalc.prototype.update = function(inputObj)");
+		this.updateReport();
+		this.log("FINISH sCalc.prototype.update = function(inputObj)");
 	}
 
 
+	sCalc.prototype.updateReport = function(inputObj) {
+		for (var k in this.reportFields) {
+			this.reportFields[k].innerHTML = this.v[k];
+		}
+	}
+
 	sCalc.prototype.calculate = function() {
-	this.log("CALL sCalc.prototype.calculate = function() ");
+		this.log("CALL sCalc.prototype.calculate = function() ");
 		try {
 			eval ("var v = this.v; " + this.calculator);
 		} 
 		catch (exception) {
 			alert(exception);
 		}
-	this.log("FINISH sCalc.prototype.calculate = function() ");
+		this.log("FINISH sCalc.prototype.calculate = function() ");
 	}
 
 
 	sCalc.prototype.buildForm = function() {
-	this.log("CALL sCalc.prototype.buildForm = function()");
+		this.log("CALL sCalc.prototype.buildForm = function()");
 		var formBox = createSuperElement("div", ["class", "spellCalcForm"], ["innerHTML", "Form Box"]);
 		this.elems.formBox = formBox;
 
@@ -76,7 +83,7 @@ var sCalc = function(targ, v, f, c, r, logger) {
 				this.buildFormRow(this.f[i], formTable)
 			}
 		}
-	this.log("FINISH sCalc.prototype.buildForm = function()");
+		this.log("FINISH sCalc.prototype.buildForm = function()");
 	}
 
 
@@ -86,8 +93,6 @@ var sCalc = function(targ, v, f, c, r, logger) {
 		var td;
 
 		tr = createSuperElement("tr");
-//		td = createSuperElement("td",["innerHTML", "Row " + usefulTypeOf(rdef)] );
-//		appendChildren(tr,td);
 
 		if (usefulTypeOf(rdef) === "[object Array]" ) {
 			for (var j = 0; j < rdef.length; j++) {
@@ -150,8 +155,6 @@ var sCalc = function(targ, v, f, c, r, logger) {
 		var td;
 
 		tr = createSuperElement("tr");
-		td = createSuperElement("td",["innerHTML", "Row " + usefulTypeOf(rdef)] );
-		appendChildren(tr,td);
 
 		if (usefulTypeOf(rdef) === "[object Array]" ) {
 			for (var j = 0; j < rdef.length; j++) {
@@ -174,56 +177,56 @@ var sCalc = function(targ, v, f, c, r, logger) {
 				cell = createSuperElement("td", ["class", "spellCalcRep"], ["innerHTML",cellDef]);
 			}
 		} 
+		else if (usefulTypeOf(cellDef) === "[object Object]") {
+			if (cellDef.text && usefulTypeOf(cellDef.text) === "[object String]") {
+				if (cellDef.text.charAt(0) === "$") {
+					cell = createSuperElement("td", ["class", "spellCalcRep" + cellDef["class"] ],
+						["colspan", (cellDef.cols) ? cellDef.cols : 1] );
+					appendChildren(cell,this.buildReportDynamicSpan(cellDef.text));
+				} else {
+				cell = createSuperElement("td", 
+						["class", "spellCalcRep" + cellDef["class"] ],
+						["colspan", (cellDef.cols) ? cellDef.cols : 1],
+						["innerHTML", cellDef.text]);
+				}
+			}
+			else if (cellDef.text && usefulTypeOf(cellDef.text) === "[object Array]") {
+				cell = createSuperElement("td",["class", "spellCalcRep" + cellDef["class"] ], ["colspan", (cellDef.cols) ? cellDef.cols : 1] );
+				this.concatDynamicSpans(cellDef.text,cell);
+			}
+		}
+
 
 		if (!cell) {
-			cell = createSuperElement("td",["innerHTML","error"] );
+			cell = createSuperElement("td",["innerHTML",usefulTypeOf(cellDef)] );
 		}
 		appendChildren(row, cell);
 
-/*
-		else if (usefulTypeOf(cellDef) === "[object Object]" ) {
-			cell = createSuperElement("td", 
-					["class", "spellCalcRep" + cellDef["class"] ],
-					["colspan", (cellDef.cols) ? cellDef.cols : 1],
-					["innerHTML",usefulTypeOf(cellDef.text)]);
-		}
-/*			tdI = createSuperElement("td", ["colspan", (cellDef.fCol) ? cellDef.fCol : 1]);
-			inp = createSuperElement("input", 
-				["size",2], ["maxlength",4], 
-				["value", (this.v[cellDef.map]) ? this.v[cellDef.map] : 0 ],
-				["onchange", "this.SCobj.update(this);"]);
-			inp.inpDef = cellDef;
-			inp.SCobj = this;
-			appendChildren(tdI,inp);
-*/
 		this.log("FINISH sCalc.prototype.buildReportCell = function(cellDef, row)");
 	}
 
 	sCalc.prototype.buildReportDynamicSpan = function(varName) {
 		this.log("CALL sCalc.prototype.buildReportDynamicSpan = function(" + varName + ")");
 		var fieldName = varName.substring(1,varName.length);
-		this.reportFields[fieldName] = createSuperElement("span", ["innerHTML", fieldName + " " + this.v[fieldName] ]);
+		this.reportFields[fieldName] = createSuperElement("span", ["innerHTML", this.v[fieldName] ]);
 		this.log("FINISH sCalc.prototype.buildReportDynamicSpan = function(" + fieldName + ")");
 		return this.reportFields[fieldName];
 	}
 
-
-
-
-/*
-var sCalc = {
-	"version": "20131014a",
-	"formname": "sCalcInterface",
-	"CSSname": "sCalc",
-	"displayBox": "sCalc",
-	"Manager": "Manager", // used to target the Manager object in dynamically generated onClick, onChange, and other objects.
-	"debug":  true,
-	"traceLog": "",
-	"logCalls": 0,
-	"storageName": "chronSpellCalc"
-}; 
-
-*/
+	sCalc.prototype.concatDynamicSpans = function(textDef, cell) {
+		this.log("CALL sCalc.prototype.concatDynamicSpans = function(textDef, cell)");
+		if (usefulTypeOf(textDef) === "[object Array]") {
+			for (var i = 0; i < textDef.length; i++) {
+				if (textDef[i].charAt(0) === "$") {
+					appendChildren(cell,this.buildReportDynamicSpan(textDef[i]));
+				}
+				else {
+					appendChildren(cell, createSuperElement("span", ["innerHTML", textDef[i] ] ) );
+				}
+			}
+		}
+		this.log("FINISH sCalc.prototype.concatDynamicSpans = function(textDef, cell)");
+	}
 
 
 	sCalc.prototype.log = function(msg) {

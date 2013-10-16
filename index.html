@@ -42,6 +42,7 @@
 	"damageDiceType": "d6",
 
 	"totalTAV": 0,
+	"totalStrain": 0,
 	"power":0 ,
 	"staging": 0,
 	"damageDice": 0,
@@ -50,8 +51,8 @@
 
 	"txtDamage": "",
 	"txtStaging": "",
-	"txtResist": "",
-	"txtDrain": "",
+	"txtResist": "Some resist",
+	"txtDrain": "Some drain",
 	"txtSurge": "",
 
 	"EPOT": 1,
@@ -83,6 +84,7 @@ v.totalStrain = v.strainBASE + (v.EPOT * v.strainEPOT) + (v.targets * v.strainTA
 		<td>
 			Report: <textarea id="report"  rows="10" cols="40">
 [
+	[ {"text": "Total Strain:", "class": "header"}, "$totalStrain", {"text": "Total TAV:"}, "$totalTAV" ],
 	[ { "text": "Damage: ", "class": "header"}, { "text": ["$txtDamage", " per round"]} , {"text": "Resist: ", "class":"header"}, "$txtResist"],
 	[ { "text": "Drain: ", "class": "header"}, { "text": "$txtDrain", "cols": 3}, "Yay" ]
 ]
