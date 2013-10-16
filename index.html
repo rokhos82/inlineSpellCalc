@@ -5,7 +5,7 @@
 	<link href="sCalc.css" rel="stylesheet" type="text/css" />
 
 
-	
+	<script type="text/javascript" src="logger.js"></script>
 	<script type="text/javascript" src="sCalc.js"></script>
 
 
@@ -14,7 +14,7 @@
 
 <body>
 		<div class='console'>
-			<form id="commandLine" name="commandLine" size="120" onSubmit="pracMan.eval(document.forms['commandLine'].elements['command'].value); updateDebugBox(); document.forms['commandLine'].elements['command'].value = ''; return false;">
+			<form id="commandLine" name="commandLine" size="120" onSubmit="Manager.eval(document.forms['commandLine'].elements['command'].value); updateDebugBox(); document.forms['commandLine'].elements['command'].value = ''; return false;">
 				<input class='console' size="80" name="command" /><input type="submit" value="run" />
 			</form>
 		</div>
@@ -97,7 +97,8 @@ v.totalStrain = v.strainBASE + (v.EPOT * v.strainEPOT) + (v.targets * v.strainTA
 			document.getElementById('variables').value,
 			document.getElementById('formStruc').value,
 			document.getElementById('calculator').value,
-			document.getElementById('report').value) );" value="add new object"/>
+			document.getElementById('report').value,
+			debugLog) );" value="add new object"/>
 	</div>
 
 

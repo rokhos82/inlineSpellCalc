@@ -1,4 +1,4 @@
-var sCalc = function(targ, v, f, c, r) {
+var sCalc = function(targ, v, f, c, r, logger) {
 	this.displayBox = document.getElementById(targ);
 	this.elems = {};
 
@@ -7,28 +7,30 @@ var sCalc = function(targ, v, f, c, r) {
 	this.calculator = c;
 	this.report = r;
 
-	this.repFields = {};
+	this.reportFields = {};
 
+
+	this.logger = logger;
 	this.initialize();
-	this.log = "";
+
 }
 
 
 	sCalc.prototype.initialize = function() {
-	this.log += "CALL sCalc.prototype.initialize = function()\n";
+	this.log("CALL sCalc.prototype.initialize = function()");
 		this.v = JSON.parse(this.variables);
 		this.f = JSON.parse(this.formStruc);
 		this.r = JSON.parse(this.report);
 
 		this.buildForm();
-//		this.buildReport();
-//		this.update();
-	this.log += "FINISH sCalc.prototype.initialize = function()\n";
+		this.buildReport();
+		this.update();
+	this.log("FINISH sCalc.prototype.initialize = function()");
 	}
 
 
 	sCalc.prototype.update = function(inputObj) {
-	this.log += "CALL sCalc.prototype.update = function(inputObj) \n";
+	this.log ("CALL sCalc.prototype.update = function(inputObj)");
 		if (inputObj) {
 			if (inpObj.inpDef && inputObj.inpDef.inpType === "text") {
 				this.v[inputObj.inpDef.map] = inputObj.value;
@@ -44,21 +46,24 @@ var sCalc = function(targ, v, f, c, r) {
 				this.calculate();
 			}
 		}
-	this.log += "CALL sCalc.prototype.update = function(inputObj) \n";
+	this.log("FINISH sCalc.prototype.update = function(inputObj)");
 	}
 
 
 	sCalc.prototype.calculate = function() {
+	this.log("CALL sCalc.prototype.calculate = function() ");
 		try {
 			eval ("var v = this.v; " + this.calculator);
 		} 
 		catch (exception) {
 			alert(exception);
 		}
+	this.log("FINISH sCalc.prototype.calculate = function() ");
 	}
 
 
 	sCalc.prototype.buildForm = function() {
+	this.log("CALL sCalc.prototype.buildForm = function()");
 		var formBox = createSuperElement("div", ["class", "spellCalcForm"], ["innerHTML", "Form Box"]);
 		this.elems.formBox = formBox;
 
@@ -71,10 +76,12 @@ var sCalc = function(targ, v, f, c, r) {
 				this.buildFormRow(this.f[i], formTable)
 			}
 		}
+	this.log("FINISH sCalc.prototype.buildForm = function()");
 	}
 
 
 	sCalc.prototype.buildFormRow = function(rdef, table) {
+		this.log("CALL sCalc.prototype.buildFormRow = function(rdef, table)");
 		var tr;
 		var td;
 
@@ -89,10 +96,12 @@ var sCalc = function(targ, v, f, c, r) {
 		}
 
 		appendChildren(table, tr);
+		this.log("FINISH sCalc.prototype.buildFormRow = function(rdef, table)");
 	}
 
 
 	sCalc.prototype.buildFormCell = function(cellDef, row) {
+		this.log("CALL sCalc.prototype.buildFormCell = function(cellDef, row)");
 		var tdH;
 		var tdI;
 		var inp;
@@ -110,6 +119,7 @@ var sCalc = function(targ, v, f, c, r) {
 
 			appendChildren(row, tdH,tdI);
 		}
+		this.log("FINISH sCalc.prototype.buildFormCell = function(cellDef, row)");
 	}
 
 
@@ -118,6 +128,7 @@ var sCalc = function(targ, v, f, c, r) {
 
 
 	sCalc.prototype.buildReport = function() {
+		this.log("CALL sCalc.prototype.buildReport = function()");
 		var repBox = createSuperElement("div", ["class", "spellCalcRep"], ["innerHTML","Report Box"])
 		this.elems.repBox = repBox;
 
@@ -130,9 +141,11 @@ var sCalc = function(targ, v, f, c, r) {
 				this.buildReportRow(this.r[i], repTable);
 			}
 		}		
+		this.log("FINISH sCalc.prototype.buildReport = function()");
 	}
 
 	sCalc.prototype.buildReportRow = function(rdef, table) {
+		this.log("CALL sCalc.prototype.buildReportRow = function(rdef, table)");
 		var tr;
 		var td;
 
@@ -147,20 +160,24 @@ var sCalc = function(targ, v, f, c, r) {
 		}
 
 		appendChildren(table, tr);
+		this.log("FINISH sCalc.prototype.buildReportRow = function(rdef, table)");
 	}
 
 	sCalc.prototype.buildReportCell = function(cellDef, row) {
+		this.log("CALL sCalc.prototype.buildReportCell = function(cellDef, row)");
 		var cell;
-
 		if (usefulTypeOf(cellDef) === "[object String]") {
-			if (cellDef.indexOf(0) === "$") {
-				this.buildReportDynamicSpan(cellDef);
-				cell = createSuperElement("td", ["innerHTML",cellDef]);
+			if (cellDef.charAt(0) === "$") {
+				cell = createSuperElement("td");
+				appendChildren(cell,this.buildReportDynamicSpan(cellDef));
 			} else {
 				cell = createSuperElement("td", ["class", "spellCalcRep"], ["innerHTML",cellDef]);
 			}
 		} 
 
+		if (!cell) {
+			cell = createSuperElement("td",["innerHTML","error"] );
+		}
 		appendChildren(row, cell);
 
 /*
@@ -179,11 +196,15 @@ var sCalc = function(targ, v, f, c, r) {
 			inp.SCobj = this;
 			appendChildren(tdI,inp);
 */
+		this.log("FINISH sCalc.prototype.buildReportCell = function(cellDef, row)");
 	}
 
 	sCalc.prototype.buildReportDynamicSpan = function(varName) {
-		var fieldName = varName.substring(1,varName.legnth - 1);
-		alert(fieldName);
+		this.log("CALL sCalc.prototype.buildReportDynamicSpan = function(" + varName + ")");
+		var fieldName = varName.substring(1,varName.length);
+		this.reportFields[fieldName] = createSuperElement("span", ["innerHTML", fieldName + " " + this.v[fieldName] ]);
+		this.log("FINISH sCalc.prototype.buildReportDynamicSpan = function(" + fieldName + ")");
+		return this.reportFields[fieldName];
 	}
 
 
@@ -206,8 +227,9 @@ var sCalc = {
 
 
 	sCalc.prototype.log = function(msg) {
-		this.logCalls++;
-		this.traceLog = sCalc.logCalls.toString() + ": " + msg + "\n" + this.traceLog;
+		if (this.logger && this.logger.log) {
+			this.logger.log(msg);
+		}
 	}
 
 	sCalc.prototype.clearLog = function() {

@@ -1,16 +1,27 @@
 var debugBox = document.getElementById("debug_feedback");
+
+var debugLog = new logger();
+
 function updateDebugBox() {
-	debugBox.innerHTML = sCalc.traceLog;
+	debugBox.innerHTML = debugLog.traceLog;
 }
 
 var Manager = {};
 Manager.devStack = new Array();
+
+Manager.eval = function(cmd) {
+	debugLog.log(cmd);
+	try {
+		eval(cmd);
+	} 
+	catch (exception) {
+		debugLog.log(exception);
+	}
+}
+
 //var Manager = new pracMan.pracManagerSVC(ManagerData, "pracManDisplay");
 
 
-var logger = {
-	
-}
 
 /*
 if (Manager.activeChar) {
