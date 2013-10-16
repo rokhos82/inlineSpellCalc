@@ -5,7 +5,7 @@ Used to create an inline spell calculator for kantia system website.
 
 
 Variables
-=========
+---------
 
 Variables are simple JSON objects, nothing more than "key":value pairs.
 
@@ -50,7 +50,7 @@ Example:
 		}
 
 Forms
-=====
+-----
 Forms are defined as an Array of Arrays.  Each sub-array represents one row.
 Rows are objects with the followings attributes: {"map": "variableName", "label": "Label Text"}
 Optional attributes are "hCol" and "fCol" for the colspan of the header or form field. "inpType":"text" will allow non-numeric input.
@@ -63,7 +63,7 @@ Sample Form Structure:
 		]
 
 Calculations
-============
+------------
 
 Calculation is valid javascript.  Use math and string functions to manipulate variables.  All object variables are accessible with "v."
 
@@ -73,7 +73,8 @@ Sample Calculation:
 		v.totalStrain = v.strainBASE + (v.EPOT * v.strainEPOT) + (v.targets * v.strainTARG);
 
 Reports
-=======
+-------
+
 Reports are a sloppy convoluted heirachal mess:
 
 Reports are output defined as an array of arrays. Each sub-array represents one row.
