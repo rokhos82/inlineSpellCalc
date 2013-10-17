@@ -28,8 +28,9 @@
 			<br />
 			Variables: <textarea id="variables" rows="10" cols="40">
 {
+	"name": "Brilliant Lance",
 	"stamMIN": 1,
-	"strainBASE": 4,
+	"strainBASE": 3,
 	"strainEPOT": 3,
 	"strainAOE": 0,
 	"strainTARG": 4,
@@ -38,7 +39,7 @@
 	"diffBASE": 20,
 	"diffEPOT": 20,
 	"diffAOE": 0,
-	"diffTARG": 10,
+	"diffTARG": 20,
 	"diffRANGE": 0,
 	"diffDUR": 0,
 	"damageDiceType": "d6",
@@ -53,8 +54,8 @@
 
 	"txtDamage": "",
 	"txtStaging": "",
-	"txtResist": "Some resist",
-	"txtDrain": "Some drain",
+	"txtResist": "",
+	"txtDrain": "",
 	"txtSurge": "",
 
 	"EPOT": 1,
@@ -84,6 +85,8 @@
 			Calculation: <textarea id="calculator"  rows="10" cols="40">
 v.totalTAV = v.diffBASE + (v.EPOT * v.diffEPOT) + (v.targets * v.diffTARG);
 v.totalStrain = v.strainBASE + (v.EPOT * v.strainEPOT) + (v.targets * v.strainTARG);
+v.staging = v.power + v.attribute - 10;
+v.txtDamage = v.EPOT + v.damageDiceType;
 		</textarea>
 		</td>
 
@@ -96,8 +99,9 @@ v.totalStrain = v.strainBASE + (v.EPOT * v.strainEPOT) + (v.targets * v.strainTA
 			Concatenation of text and dynamic fields are possible by defining a "text" attribute as an array like {"text": ["a", "b", "$variable", "c"]}</br>
 			Report: <textarea id="report"  rows="10" cols="40">
 [
+	[ {"text": "Name:", "class": "header"} , "$name" ],
 	[ {"text": "Total Strain:", "class": "header"}, "$totalStrain", {"text": "Total TAV:"}, "$totalTAV" ],
-	[ { "text": "Damage: ", "class": "header"}, { "text": ["$txtDamage", " per round"]} , {"text": "Resist: ", "class":"header"}, "$txtResist"],
+	[ { "text": "Damage: ", "class": "header"}, { "text": ["$txtDamage", " per target"]} , {"text": "Resist: ", "class":"header"}, "$txtResist"],
 	[ { "text": "Drain: ", "class": "header"}, { "text": "$txtDrain", "cols": 3}, "Yay" ]
 ]
 		</textarea>
