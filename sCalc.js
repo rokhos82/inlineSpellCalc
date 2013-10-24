@@ -1,41 +1,86 @@
-var sCalc = function(targ, v, f, c, r, logger) {
+var sCalc = function(targ, sCalcId, defv, f, c, r, tovr, userPrefs, horiz, logger) {
 	this.displayBox = document.getElementById(targ);
+	this.sCalcId = sCalcId;
 	this.elems = {};
 
-	this.variables = v;
+	this.layout = (horiz !== "horiz") ? "vert" : "horiz";
+
+	this.defVariables = defv;
+	this.templateVarOverrides = tovr;
 	this.formStruc = f;
 	this.calculator = c;
 	this.report = r;
 
 	this.reportFields = {};
 
-
+	if ( userPrefs && userPrefs.saveData) {
+		this.userPrefs = userPrefs;
+	} else {
+		this.userPrefs = new sCalcPrefs("spellCalcDefault");
+	}
 	this.logger = logger;
 	this.initialize();
 
 }
-
+	
 
 	sCalc.prototype.initialize = function() {
 		this.log("CALL sCalc.prototype.initialize = function()");
-		this.v = JSON.parse(this.variables);
+		this.v = JSON.parse(this.defVariables);
 		this.f = JSON.parse(this.formStruc);
 		this.r = JSON.parse(this.report);
 
+		if (this.templateVarOverrides) {
+			this.tovr = JSON.parse(this.templateVarOverrides);
+		} else {
+			this.tovr = {};
+		}
+		this.templateOveride();
+		this.setLayout();
 		this.buildForm();
 		this.buildReport();
 		this.update();
 		this.log("FINISH sCalc.prototype.initialize = function()");
 	}
 
+	sCalc.prototype.templateOveride = function() {
+		if (usefulTypeOf(this.tovr) === "[object Object]") {
+			for (var key in this.tovr) {
+				this.v[key] = this.tovr[key];
+			}
+		}
+	}
+
+	sCalc.prototype.setLayout = function() {
+		var layoutTable = createSuperElement("table", ["class","spellCalcFormReport"]);
+		if (this.layout === "horiz") {
+			var tr = createSuperElement("tr");
+			var formTD = createSuperElement("td");
+			var repTD = createSuperElement("td");
+			appendChildren(this.displayBox, layoutTable);
+			appendChildren(layoutTable, tr);
+			appendChildren(tr,formTD,repTD);
+			this.elems.formTD= formTD;
+			this.elems.repTD=repTD;
+		} else {
+			var tr1 = createSuperElement("tr");
+			var tr2 = createSuperElement("tr");
+			var formTD = createSuperElement("td");
+			var repTD = createSuperElement("td");
+			appendChildren(this.displayBox, layoutTable);
+			appendChildren(layoutTable, tr1, tr2);
+			appendChildren(tr1,formTD);
+			appendChildren(tr2,formTD);
+			this.elems.formTD= formTD;
+			this.elems.repTD=repTD;			
+		}
+	}
 
 	sCalc.prototype.update = function(inputObj) {
-		this.log ("CALL sCalc.prototype.update = function(inputObj)");
+		this.log ("CALL sCalc.prototype.update = function(inputObj, inpDef)");
 		if (inputObj) {
 			if (inputObj.inpDef && inputObj.inpDef.inpType === "text") {
 				this.v[inputObj.inpDef.map] = inputObj.value;
-
-				this.calculate();
 			} else {
 				if ( isNaN(inputObj.value) ) {
 					inputObj.value = this.v[inputObj.inpDef.map];
@@ -43,13 +88,30 @@ var sCalc = function(targ, v, f, c, r, logger) {
 				else {
 					this.v[inputObj.inpDef.map] = parseInt(inputObj.value,10);
 				}
-				this.calculate();
 			}
 		}
+		this.calculate();
 		this.updateReport();
-		this.log("FINISH sCalc.prototype.update = function(inputObj)");
+		this.log("FINISH sCalc.prototype.update = function(inputObj, inpDef)");
 	}
 
+	sCalc.prototype.updateUserPrefs = function(inpObj, inpDef) {
+		this.log ("CALL sCalc.prototype.updateUserPrefs = function(inpObj, inpDef)");
+
+		if (inpDef.map) {
+			if (inpDef.map.substring(0,6) === "global" ) {
+				this.userPrefs.spellKeys["globalVar"][inpDef.map] = this.v[inpDef.map];
+			} else if (this.userPrefs.spellKeys[this.sCalcId] && usefulTypeOf(this.userPrefs.spellKeys[this.sCalcId]) === "[object Object]") {
+				this.userPrefs.spellKeys[this.sCalcId][inpDef.map] = this.v[inpDef.map];
+			} else {
+				this.userPrefs.spellKeys[this.sCalcId] = {};
+				this.userPrefs.spellKeys[this.sCalcId][inpDef.map] = this.v[inpDef.map];
+			}
+			this.userPrefs.saveData();
+		}
+
+		this.log("FINISH sCalc.prototype.updateUserPrefs = function(inpObj, inpDef)");
+	}
 
 	sCalc.prototype.updateReport = function(inputObj) {
 		for (var k in this.reportFields) {
@@ -71,10 +133,9 @@ var sCalc = function(targ, v, f, c, r, logger) {
 
 	sCalc.prototype.buildForm = function() {
 		this.log("CALL sCalc.prototype.buildForm = function()");
-		var formBox = createSuperElement("div", ["class", "spellCalcForm"], ["innerHTML", "Form Box"]);
-		this.elems.formBox = formBox;
+		var formBox = createSuperElement("div", ["class", "spellCalcForm"]);
 
-		appendChildren(this.displayBox,formBox);
+		appendChildren(this.elems.formTD,formBox);
 
 		if (usefulTypeOf(this.f) === "[object Array]") {
 			var formTable = createSuperElement("table", ["class", "spellCalcForm"]);
@@ -115,29 +176,44 @@ var sCalc = function(targ, v, f, c, r, logger) {
 			tdH = createSuperElement("td", ["innerHTML",cellDef.label], ["class","spellCalcHead"], ["colspan", (cellDef.hCol) ? cellDef.hCol : 1]);
 			tdI = createSuperElement("td", ["colspan", (cellDef.fCol) ? cellDef.fCol : 1]);
 			inp = createSuperElement("input", 
-				["size",2], ["maxlength",4], 
+				["size", (cellDef.size) ? cellDef.size : 2 ],
+				["maxlength", (cellDef.maxlength) ? cellDef.maxlength : 4], 
 				["value", (this.v[cellDef.map]) ? this.v[cellDef.map] : 0 ],
-				["onchange", "this.SCobj.update(this);"]);
+				["onchange", "this.SCobj.update(this); this.SCobj.updateUserPrefs(this, inpDef);"]);
 			inp.inpDef = cellDef;
 			inp.SCobj = this;
 			appendChildren(tdI,inp);
 
 			appendChildren(row, tdH,tdI);
+
+			this.setUserDefault( inp );
 		}
 		this.log("FINISH sCalc.prototype.buildFormCell = function(cellDef, row)");
 	}
 
 
+	sCalc.prototype.setUserDefault = function(inpObj) {
+		this.log("CALL sCalc.prototype.setUserDefault = function(cellDef)");
 
+		if (inpObj.inpDef && inpObj.inpDef.map) {
+			if ( this.userPrefs.spellKeys["globalVar"][inpObj.inpDef.map] ) {
+				inpObj.value = this.userPrefs.spellKeys["globalVar"][inpObj.inpDef.map];
+				this.v[inpObj.inpDef.map] = this.userPrefs.spellKeys["globalVar"][inpObj.inpDef.map];
+			} else if ( this.userPrefs.spellKeys[this.sCalcId] && this.userPrefs.spellKeys[this.sCalcId][inpObj.inpDef.map] ) {
+				inpObj.value = this.userPrefs.spellKeys[this.sCalcId][inpObj.inpDef.map];
+				this.v[inpObj.inpDef.map] = this.userPrefs.spellKeys[this.sCalcId][inpObj.inpDef.map];
+			}
+		}
+		this.log("FINISH sCalc.prototype.setUserDefault = function(cellDef)");
+	}
 
 
 
 	sCalc.prototype.buildReport = function() {
 		this.log("CALL sCalc.prototype.buildReport = function()");
-		var repBox = createSuperElement("div", ["class", "spellCalcRep"], ["innerHTML","Report Box"])
-		this.elems.repBox = repBox;
+		var repBox = createSuperElement("div", ["class", "spellCalcRep"]);
 
-		appendChildren(this.displayBox,repBox);
+		appendChildren(this.elems.repTD,repBox);
 
 		if (usefulTypeOf(this.r) === "[object Array]") {
 			var repTable = createSuperElement("table", ["class", "spellCalcRep"]);
@@ -228,6 +304,27 @@ var sCalc = function(targ, v, f, c, r, logger) {
 		this.log("FINISH sCalc.prototype.concatDynamicSpans = function(textDef, cell)");
 	}
 
+	sCalc.prototype.calc_adjust = function(rank, limit) {
+		this.log("CALL sCalc.prototype.calc_adjust = function(rank, limit)");
+
+		limit = (isNaN(limit)) ? 100 : parseInt(limit);
+		var adj = 0;
+		if (!isNaN(rank)) {
+			if ( rank > 10) {
+				adj = (parseInt(rank) - 10) * 2;
+				adj = (adj > limit) ? limit : adj;
+				return adj;
+			} else {
+				for (var i = rank - 10; i < 0; i++) {
+					adj = adj + i;
+				}
+				return adj;
+			}
+		} else {
+			return 0;
+		}
+	}
+
 
 	sCalc.prototype.log = function(msg) {
 		if (this.logger && this.logger.log) {
@@ -249,6 +346,8 @@ var sCalc = function(targ, v, f, c, r, logger) {
 		}
 	}
 	
+
+
 
 
 	
